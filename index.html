@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Debora 3# — Consulta CNPJ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0a0c14;--panel:#12151f;--alt:#151823;--line:#1f2433;--mut:#8a93a6;--grn:#00d4aa;--blu:#3b82f6;--red:#ef4444;--yel:#f59e0b;--purple:#a78bfa}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -16,11 +19,11 @@ header p{margin:6px 0 0;color:var(--mut);font-size:13px}
 
 /* ── Two-column page layout ── */
 .page-layout{display:flex;min-height:calc(100vh - 82px);align-items:stretch}
-.robot-column{flex:0 0 42%;max-width:560px;background:linear-gradient(180deg,#0d1018 0%,#12151f 100%);border-right:1px solid var(--line);padding:24px 20px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;position:sticky;top:0;height:calc(100vh - 82px);overflow:hidden}
+.robot-column{flex:0 0 42%;max-width:560px;background:linear-gradient(180deg,#0d1018 0%,#12151f 100%);border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;position:sticky;top:0;height:calc(100vh - 82px);overflow:hidden;padding:0}
 .content-column{flex:1 1 auto;padding:0 0 60px;overflow-x:hidden}
 @media(max-width:900px){
   .page-layout{flex-direction:column}
-  .robot-column{flex:0 0 auto;max-width:100%;width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid var(--line);padding:20px 16px}
+  .robot-column{flex:0 0 auto;max-width:100%;width:100%;height:60vh;position:relative;border-right:none;border-bottom:1px solid var(--line)}
 }
 
 .search-area{max-width:560px;margin:40px auto 0;padding:0 24px}
@@ -33,41 +36,6 @@ header p{margin:6px 0 0;color:var(--mut);font-size:13px}
 .search-box button:disabled{opacity:.5;cursor:not-allowed;transform:none}
 .input-error{color:var(--red);font-size:12px;margin-top:6px;text-align:center;min-height:18px}
 .search-hint{color:var(--mut);font-size:12px;text-align:center;margin-top:10px}
-
-/* ── Mascot Area ── */
-.mascot-area{width:100%;max-width:520px;margin:0 auto;text-align:center;display:flex;flex-direction:column;align-items:center;flex:1}
-
-.robot-stage{position:relative;width:100%;padding:10px 0 10px;display:flex;flex-direction:column;align-items:center;flex:1;justify-content:center}
-
-/* Robobruno SVG */
-#robotSvg{cursor:pointer;transition:transform .15s;width:320px;height:auto;max-width:90%;display:block;filter:drop-shadow(0 14px 22px rgba(0,0,0,.28))}
-#robotSvg:active{transform:scale(0.97)}
-#robotSvg .clickable{cursor:pointer}
-#robotSvg .clickable:hover{filter:brightness(1.12)}
-@media(max-width:900px){#robotSvg{width:230px}}
-
-/* Speech bubble */
-.speech-bubble{background:var(--panel);border:2px solid var(--line);border-radius:20px;padding:18px 26px;margin:0 auto;max-width:540px;font-size:17px;line-height:1.5;color:#e6e9f0;position:relative;min-height:52px;display:flex;align-items:center;justify-content:center;animation:fadeInUp .3s ease-out;margin-top:16px}
-.speech-bubble::before{content:'';position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:10px solid var(--line)}
-.speech-bubble::after{content:'';position:absolute;top:-7px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:8px solid var(--panel)}
-
-/* Fun facts */
-.fun-facts{margin-top:14px;padding:0 20px;min-height:24px}
-.fun-fact{color:var(--mut);font-size:13px;animation:fadeInUp .4s ease-out}
-.fun-fact strong{color:var(--yel)}
-
-/* Float icons (during search) */
-.float-icons{position:absolute;width:100%;height:100%;top:0;left:0;pointer-events:none}
-.float-icon{position:absolute;font-size:20px;opacity:0;animation:iconFloat 4s ease-out infinite}
-
-/* Emoji reaction pop (poke, results) */
-.emoji-pops{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:5}
-.emoji-pop{position:absolute;font-size:30px;opacity:0;animation:emojiPop 1.4s ease-out forwards;filter:drop-shadow(0 2px 4px rgba(0,0,0,.4))}
-.emoji-pop.big{font-size:48px;animation-duration:1.8s}
-
-/* Angry eyes overlay */
-.robot-angry #leftPupil, .robot-angry #rightPupil{fill:#ef4444 !important}
-
 
 /* ── Results ── */
 .results-area{max-width:640px;margin:32px auto 0;padding:0 24px 60px;display:none}
@@ -97,23 +65,159 @@ header p{margin:6px 0 0;color:var(--mut);font-size:13px}
 .confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999}
 .confetti-piece{position:absolute;width:8px;height:8px;top:-10px;animation:confettiFall 3s ease-in forwards}
 
-/* ── Animations ── */
+/* ── App Animations ── */
 @keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes dotPulse{0%,80%,100%{opacity:.3}40%{opacity:1}}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-@keyframes antennaPulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
-@keyframes iconFloat{0%{opacity:0;transform:translateY(0)}15%{opacity:.7}85%{opacity:.7}100%{opacity:0;transform:translateY(-180px)}}
-@keyframes celebrate{0%{transform:scale(1)}25%{transform:scale(1.1) rotate(-3deg)}50%{transform:scale(1.15) rotate(3deg)}75%{transform:scale(1.1) rotate(-2deg)}100%{transform:scale(1)}}
-@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
-@keyframes jump{0%,100%{transform:translateY(0)}40%{transform:translateY(-20px)}60%{transform:translateY(-20px)}}
 @keyframes confettiFall{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
-@keyframes robotFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-@keyframes waveArm{0%,100%{transform:rotate(0deg)}25%{transform:rotate(-20deg)}75%{transform:rotate(20deg)}}
-@keyframes emojiPop{0%{opacity:0;transform:translate(-50%,0) scale(.5)}20%{opacity:1;transform:translate(-50%,-30px) scale(1.2)}50%{opacity:1;transform:translate(-50%,-70px) scale(1)}100%{opacity:0;transform:translate(-50%,-130px) scale(.9)}}
-@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
-@keyframes tickleShake{0%,100%{transform:translateX(0)}10%{transform:translateX(-3px)}20%{transform:translateX(3px)}30%{transform:translateX(-3px)}40%{transform:translateX(3px)}50%{transform:translateX(-3px)}60%{transform:translateX(3px)}70%{transform:translateX(-3px)}80%{transform:translateX(3px)}90%{transform:translateX(-3px)}}
-@keyframes sadDroop{0%{transform:translateY(0)}100%{transform:translateY(3px) rotate(-2deg)}}
+
+/* ── TED Mascot Embed CSS ── */
+
+.ted-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+
+.ted-nametag {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 110px;
+  background: white;
+  border: 2px solid #c8102e;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  transform: rotate(-3deg);
+  font-family: "Segoe UI", system-ui, sans-serif;
+  z-index: 4;
+}
+
+.ted-nametag-header {
+  display: block;
+  background: #c8102e;
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 3px 6px 2px;
+}
+
+.ted-nametag-name {
+  display: block;
+  color: #111;
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-align: center;
+  padding: 5px 6px 8px;
+  font-family: "Pacifico", cursive;
+  line-height: 1;
+}
+
+.ted-bubble {
+  position: absolute;
+  bottom: 8%;
+  left: 8%;
+  right: 8%;
+  z-index: 5;
+  background: rgba(15, 20, 35, 0.92);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 14px 18px;
+  color: #e8e8e8;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-8px) scale(0.95);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.ted-bubble.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.ted-bubble::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid rgba(15, 20, 35, 0.92);
+}
+
+.ted-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ted-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  opacity: 0;
+  transition: opacity 120ms linear;
+  pointer-events: none;
+  will-change: opacity;
+  -webkit-user-drag: none;
+}
+
+.ted-video.active {
+  opacity: 1;
+}
+
+.ted-hint {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.4);
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: 11px;
+  pointer-events: none;
+  animation: ted-pulse 3s ease-in-out infinite;
+}
+
+@keyframes ted-pulse {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.6; }
+}
+
+@media (max-width: 900px) {
+  .ted-nametag { width: 96px; top: 4%; right: 4%; }
+  .ted-nametag-name { font-size: 20px; }
+  .ted-nametag-header { font-size: 8px; }
+  .ted-bubble { font-size: 13px; padding: 10px 14px; left: 5%; right: 5%; }
+}
 </style>
 </head>
 <body>
@@ -125,83 +229,7 @@ header p{margin:6px 0 0;color:var(--mut);font-size:13px}
 
 <div class="page-layout">
 <aside class="robot-column">
-
-<div class="mascot-area" id="mascotArea">
-  <div class="robot-stage" id="stage">
-    <div class="float-icons" id="floatIcons"></div>
-    <div class="emoji-pops" id="emojiPops"></div>
-    <svg id="robotSvg" onclick="pokeRobot()" width="180" height="210" viewBox="0 0 180 210" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation:robotFloat 3s ease-in-out infinite">
-      <!-- Antenna -->
-      <line x1="90" y1="18" x2="90" y2="0" stroke="#8a93a6" stroke-width="3" stroke-linecap="round" pointer-events="none"/>
-      <circle id="partAntenna" class="clickable" cx="90" cy="0" r="6" fill="#3b82f6" opacity="0.85">
-        <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/>
-        <animate attributeName="r" values="5;7;5" dur="1.5s" repeatCount="indefinite"/>
-      </circle>
-
-      <!-- Head -->
-      <rect id="partHead" class="clickable" x="35" y="18" width="110" height="72" rx="28" ry="28" fill="#e8ecf0" stroke="#d0d5dd" stroke-width="2"/>
-      <rect x="45" y="24" width="90" height="30" rx="15" fill="#fff" opacity="0.35" pointer-events="none"/>
-
-      <!-- Left eye -->
-      <circle class="eye-part" cx="65" cy="52" r="14" fill="#3b82f6"/>
-      <circle class="eye-part" cx="65" cy="52" r="10" fill="#2563eb"/>
-      <circle id="leftPupil" cx="67" cy="51" r="5" fill="#fff"/>
-
-      <!-- Right eye -->
-      <circle class="eye-part" cx="115" cy="52" r="14" fill="#3b82f6"/>
-      <circle class="eye-part" cx="115" cy="52" r="10" fill="#2563eb"/>
-      <circle id="rightPupil" cx="117" cy="51" r="5" fill="#fff"/>
-
-      <!-- Mouth (state-driven) -->
-      <path id="mouthPath" d="M72 74 Q90 86 108 74" stroke="#00d4aa" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-
-      <!-- Neck -->
-      <rect x="80" y="88" width="20" height="10" rx="4" fill="#d0d5dd"/>
-
-      <!-- Body -->
-      <rect x="45" y="96" width="90" height="68" rx="18" fill="#e8ecf0" stroke="#d0d5dd" stroke-width="2"/>
-      <rect x="55" y="102" width="70" height="24" rx="10" fill="#fff" opacity="0.3"/>
-
-      <!-- Chest screen -->
-      <rect id="partChest" class="clickable" x="62" y="118" width="56" height="28" rx="8" fill="#151823" stroke="#3b82f6" stroke-width="1.5"/>
-      <text id="screenText" x="90" y="137" text-anchor="middle" fill="#00d4aa" font-family="monospace" font-size="10" pointer-events="none">ROBOBRUNO</text>
-
-      <!-- Left arm (waving) -->
-      <g id="leftArm" class="clickable" transform-origin="50 102" style="animation:waveArm 2s ease-in-out infinite">
-        <rect x="20" y="102" width="28" height="10" rx="5" fill="#d0d5dd"/>
-        <circle cx="18" cy="107" r="7" fill="#e8ecf0" stroke="#d0d5dd" stroke-width="1.5"/>
-      </g>
-
-      <!-- Right arm -->
-      <g id="rightArm" class="clickable">
-        <rect x="132" y="102" width="28" height="10" rx="5" fill="#d0d5dd"/>
-        <circle cx="162" cy="107" r="7" fill="#e8ecf0" stroke="#d0d5dd" stroke-width="1.5"/>
-      </g>
-
-      <!-- Left leg -->
-      <g id="leftLeg" class="clickable">
-        <rect x="58" y="162" width="22" height="14" rx="7" fill="#d0d5dd" stroke="#bcc2cc" stroke-width="1"/>
-        <rect x="54" y="174" width="30" height="12" rx="6" fill="#e8ecf0" stroke="#d0d5dd" stroke-width="1.5"/>
-      </g>
-
-      <!-- Right leg -->
-      <g id="rightLeg" class="clickable">
-        <rect x="100" y="162" width="22" height="14" rx="7" fill="#d0d5dd" stroke="#bcc2cc" stroke-width="1"/>
-        <rect x="96" y="174" width="30" height="12" rx="6" fill="#e8ecf0" stroke="#d0d5dd" stroke-width="1.5"/>
-      </g>
-
-      <!-- Body accent -->
-      <line x1="70" y1="150" x2="110" y2="150" stroke="#3b82f6" stroke-width="1" opacity="0.4"/>
-      <line x1="75" y1="155" x2="105" y2="155" stroke="#3b82f6" stroke-width="1" opacity="0.3"/>
-    </svg>
-  </div>
-
-  <div class="speech-bubble" id="speechBubble">Preparando consulta...</div>
-
-  <div class="fun-facts" id="funFacts"></div>
-
-</div>
-
+  <div id="ted-container" style="width:100%;height:100%;"></div>
 </aside>
 
 <main class="content-column">
@@ -220,23 +248,299 @@ header p{margin:6px 0 0;color:var(--mut);font-size:13px}
 </main>
 </div>
 
+<!-- TED Mascot Widget -->
+<script>
+(function () {
+  "use strict";
+
+  const REACTIONS = [
+    "wave", "laugh", "poke_reaction", "tickle_belly", "tickle_feet",
+    "angry", "happy", "sad", "sleepy", "pointing_right",
+  ];
+
+  const HIT_ZONES = [
+    { y: [0.00, 0.35], reactions: ["poke_reaction", "wave", "happy", "angry"] },
+    { y: [0.35, 0.70], reactions: ["tickle_belly", "laugh"] },
+    { y: [0.70, 1.00], reactions: ["tickle_feet"] },
+  ];
+
+  const FALLBACK_LINES = [
+    { animation: "wave", text: "E aí, sumido! Tava com saudade 😏" },
+    { animation: "laugh", text: "Hahaha, tu é corajoso, hein!" },
+    { animation: "pointing_right", text: "Bora trabalhar, preguiçoso!" },
+    { animation: "happy", text: "Que bom te ver de novo! 🦊" },
+    { animation: "sleepy", text: "Tô de boa aqui, relaxa..." },
+    { animation: "angry", text: "Ei! Para de me cutucar! 😤" },
+    { animation: "laugh", text: "Tu digita que nem meu avô 🐢" },
+    { animation: "pointing_right", text: "Isso aí, vai nessa!" },
+    { animation: "happy", text: "Opa, mandou bem!" },
+    { animation: "sad", text: "Poxa, deu ruim..." },
+    { animation: "wave", text: "Olha só quem apareceu! 👋" },
+    { animation: "laugh", text: "Calma aí, tô processando a zoeira" },
+    { animation: "poke_reaction", text: "Eita! Que susto, parça!" },
+    { animation: "angry", text: "Quer parar? Tô trabalhando aqui!" },
+    { animation: "sleepy", text: "Boceja… tá lento hoje, hein?" },
+    { animation: "happy", text: "Sou o TED, prazer! Agora trabalha!" },
+  ];
+
+  const BUBBLE_DURATION_MS = 5000;
+  const DEBOUNCE_MS = 2500;
+  const RATE_LIMIT_MS = 3000;
+  const FADE_MS = 150;
+
+  class TedMascot {
+    constructor(root, options = {}) {
+      this.root = root;
+      this.videosUrl = (options.videosUrl || "./assets/videos/").replace(/\/?$/, "/");
+      this.trashTalkEndpoint = options.trashTalkEndpoint || null;
+      this.name = options.name || "TED";
+      this.idleClip = `${this.videosUrl}idle_breathing_loop.mp4`;
+
+      this.isBusy = false;
+      this._bubbleTimer = null;
+      this._debounceTimers = {};
+      this._lastLlmCall = 0;
+
+      this._build();
+      this._startIdle();
+    }
+
+    react(name) {
+      if (this.isBusy || !REACTIONS.includes(name)) return;
+      this._playReaction(name);
+    }
+
+    say(text, animation) {
+      if (animation && REACTIONS.includes(animation)) {
+        this._playReaction(animation);
+      }
+      this._showBubble(text);
+    }
+
+    onEvent(eventName, context = {}) {
+      const key = eventName;
+      if (this._debounceTimers[key]) clearTimeout(this._debounceTimers[key]);
+
+      if (eventName === "page_load") {
+        this._callTrashTalk(eventName, context);
+        return;
+      }
+
+      this._debounceTimers[key] = setTimeout(() => {
+        this._callTrashTalk(eventName, context);
+      }, DEBOUNCE_MS);
+    }
+
+    _build() {
+      this.root.classList.add("ted-root");
+
+      const nametag = document.createElement("div");
+      nametag.className = "ted-nametag";
+      nametag.innerHTML = `
+        <span class="ted-nametag-header">Olá, meu nome é</span>
+        <span class="ted-nametag-name">${this.name}</span>
+      `;
+      this.root.appendChild(nametag);
+
+      this.bubble = document.createElement("div");
+      this.bubble.className = "ted-bubble";
+      this.root.appendChild(this.bubble);
+
+      const stage = document.createElement("div");
+      stage.className = "ted-stage";
+      this.stage = stage;
+      this.root.appendChild(stage);
+
+      this.idleLayer = this._mkVideo("idle");
+      this.reactionLayer = this._mkVideo("reaction");
+      this.idleLayer.classList.add("active");
+      stage.appendChild(this.idleLayer);
+      stage.appendChild(this.reactionLayer);
+
+      const hint = document.createElement("div");
+      hint.className = "ted-hint";
+      hint.textContent = "toque para interagir";
+      this.root.appendChild(hint);
+
+      this.root.addEventListener("click", (e) => this._handleTap(e));
+      this.root.addEventListener("touchstart", (e) => {
+        if (e.touches.length > 0) {
+          const t = e.touches[0];
+          this._handleTap({ clientX: t.clientX, clientY: t.clientY });
+        }
+      }, { passive: true });
+    }
+
+    _mkVideo(kind) {
+      const v = document.createElement("video");
+      v.className = `ted-video ted-video-${kind}`;
+      v.muted = true;
+      v.playsInline = true;
+      v.preload = "auto";
+      v.setAttribute("webkit-playsinline", "true");
+      return v;
+    }
+
+    _startIdle() {
+      this.idleLayer.src = this.idleClip;
+      this.idleLayer.loop = true;
+      this.idleLayer.play().catch(() => {});
+    }
+
+    _handleTap(event) {
+      if (this.isBusy) return;
+      const rect = this.stage.getBoundingClientRect();
+      const y = (event.clientY - rect.top) / rect.height;
+
+      const zone = HIT_ZONES.find(z => y >= z.y[0] && y <= z.y[1]);
+      const reaction = zone
+        ? zone.reactions[Math.floor(Math.random() * zone.reactions.length)]
+        : "wave";
+
+      this._callTrashTalk("poke", { bodyPart: zone ? zone.y[0] < 0.35 ? "head" : zone.y[0] < 0.7 ? "body" : "feet" : "outside" });
+    }
+
+    async _playReaction(name) {
+      if (this.isBusy) return;
+      this.isBusy = true;
+
+      const clipUrl = `${this.videosUrl}${name}_seamless.mp4`;
+      const r = this.reactionLayer;
+
+      try {
+        r.src = clipUrl;
+        r.loop = false;
+        r.currentTime = 0;
+        await this._waitCanPlay(r);
+
+        const endedPromise = this._waitEnded(r);
+        await r.play().catch(() => {});
+
+        r.classList.add("active");
+        this.idleLayer.classList.remove("active");
+
+        await endedPromise;
+
+        this.idleLayer.currentTime = 0;
+        await this.idleLayer.play().catch(() => {});
+        this.idleLayer.classList.add("active");
+        r.classList.remove("active");
+
+        await new Promise(res => setTimeout(res, FADE_MS));
+      } catch (e) {
+        this.idleLayer.classList.add("active");
+        r.classList.remove("active");
+        r.pause();
+      }
+
+      this.isBusy = false;
+    }
+
+    _waitCanPlay(video, timeoutMs = 5000) {
+      return new Promise((resolve, reject) => {
+        if (video.readyState >= 3) return resolve();
+        let done = false;
+        const cleanup = () => { video.removeEventListener("canplay", ok); video.removeEventListener("error", fail); };
+        const ok = () => { if (done) return; done = true; cleanup(); resolve(); };
+        const fail = () => { if (done) return; done = true; cleanup(); reject(new Error("load error")); };
+        video.addEventListener("canplay", ok);
+        video.addEventListener("error", fail);
+        setTimeout(() => { if (done) return; done = true; cleanup(); reject(new Error("timeout")); }, timeoutMs);
+      });
+    }
+
+    _waitEnded(video) {
+      return new Promise(resolve => {
+        const h = () => { video.removeEventListener("ended", h); resolve(); };
+        video.addEventListener("ended", h);
+      });
+    }
+
+    _showBubble(text) {
+      if (!text) return;
+      clearTimeout(this._bubbleTimer);
+      this.bubble.textContent = text;
+      this.bubble.classList.add("visible");
+      this._bubbleTimer = setTimeout(() => {
+        this.bubble.classList.remove("visible");
+      }, BUBBLE_DURATION_MS);
+    }
+
+    async _callTrashTalk(event, context) {
+      const now = Date.now();
+      if (now - this._lastLlmCall < RATE_LIMIT_MS) {
+        this._useFallback(event);
+        return;
+      }
+
+      if (!this.trashTalkEndpoint) {
+        this._useFallback(event);
+        return;
+      }
+
+      this._lastLlmCall = now;
+
+      try {
+        const resp = await fetch(this.trashTalkEndpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ event, context }),
+        });
+
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+        const data = await resp.json();
+        const anim = REACTIONS.includes(data.animation) ? data.animation : "wave";
+        const text = (data.text || "").slice(0, 120);
+
+        if (text) this._showBubble(text);
+        if (anim) this._playReaction(anim);
+      } catch (e) {
+        console.warn("TED trash-talk failed:", e.message);
+        this._useFallback(event);
+      }
+    }
+
+    _useFallback(event) {
+      const eventMap = {
+        page_load: ["wave", "happy"],
+        cnpj_typing: ["pointing_right", "laugh"],
+        lookup_started: ["happy", "pointing_right"],
+        lookup_result: ["happy", "laugh", "wave"],
+        lookup_error: ["sad", "angry"],
+        idle_tick: ["sleepy", "wave", "pointing_right"],
+        poke: ["poke_reaction", "angry", "tickle_belly", "laugh"],
+      };
+      const pool = eventMap[event] || ["wave"];
+      const anim = pool[Math.floor(Math.random() * pool.length)];
+      const matching = FALLBACK_LINES.filter(l => l.animation === anim);
+      const line = matching.length > 0
+        ? matching[Math.floor(Math.random() * matching.length)]
+        : FALLBACK_LINES[Math.floor(Math.random() * FALLBACK_LINES.length)];
+
+      this._showBubble(line.text);
+      this._playReaction(line.animation);
+    }
+  }
+
+  window.TED = {
+    init(container, options) {
+      return new TedMascot(container, options);
+    },
+  };
+})();
+</script>
+
 <script>
 /* ── State ── */
 let companyData = null;
-let walkTimer = null;
-let eyeTimer = null;
-let actionTimer = null;
-let factTimer = null;
-let idleChatterTimer = null;
-let idleBlinkTimer = null;
-let isSearching = false;
-let pokeCount = 0;
-let lastPokeAt = 0;
+window.isSearching = false;
 
 /* ── CNPJ Validation ── */
 const cnpjInput = document.getElementById('cnpjInput');
 const inputError = document.getElementById('inputError');
 
+let cnpjTypingTimer = null;
 cnpjInput.addEventListener('input', function(e) {
   let v = e.target.value.replace(/\D/g, '');
   if (v.length > 14) v = v.slice(0, 14);
@@ -246,6 +550,12 @@ cnpjInput.addEventListener('input', function(e) {
   else if (v.length > 2) v = v.slice(0,2)+'.'+v.slice(2);
   e.target.value = v;
   inputError.textContent = '';
+
+  // Fire TED typing event after pause
+  clearTimeout(cnpjTypingTimer);
+  cnpjTypingTimer = setTimeout(() => {
+    if (window.ted) ted.onEvent('cnpj_typing', { partial: cnpjInput.value });
+  }, 800);
 });
 
 cnpjInput.addEventListener('keydown', function(e) {
@@ -267,457 +577,6 @@ function validateCNPJ(cnpj) {
   if (calc(w1, d) !== parseInt(d[12])) return false;
   if (calc(w2, d) !== parseInt(d[13])) return false;
   return true;
-}
-
-/* ── Robot eye animations ── */
-function moveEyes(dir) {
-  const lp = document.getElementById('leftPupil');
-  const rp = document.getElementById('rightPupil');
-  if (!lp || !rp) return;
-  if (dir === 'left')        { lp.setAttribute('cx','62'); rp.setAttribute('cx','112'); }
-  else if (dir === 'right')  { lp.setAttribute('cx','72'); rp.setAttribute('cx','122'); }
-  else if (dir === 'up')     { lp.setAttribute('cy','46'); rp.setAttribute('cy','46'); lp.setAttribute('cx','67'); rp.setAttribute('cx','117'); }
-  else if (dir === 'center') { lp.setAttribute('cx','67'); lp.setAttribute('cy','51'); rp.setAttribute('cx','117'); rp.setAttribute('cy','51'); }
-}
-
-function blinkEyes() {
-  const lp = document.getElementById('leftPupil');
-  const rp = document.getElementById('rightPupil');
-  const parts = document.querySelectorAll('#robotSvg .eye-part');
-  const all = [...parts, lp, rp].filter(Boolean);
-  all.forEach(el => {
-    el.setAttribute('transform', 'scale(1,0.1)');
-    el.setAttribute('transform-origin', el.getAttribute('cx') + ' ' + el.getAttribute('cy'));
-  });
-  setTimeout(() => all.forEach(el => el.removeAttribute('transform')), 200);
-}
-
-function startEyeMovement() {
-  const looks = ['center','left','right','up','blink','center'];
-  eyeTimer = setInterval(() => {
-    const cls = looks[Math.floor(Math.random()*looks.length)];
-    if (cls === 'blink') { blinkEyes(); }
-    else { moveEyes(cls); }
-  }, 1200);
-}
-
-function stopEyeMovement() {
-  clearInterval(eyeTimer);
-  eyeTimer = null;
-  moveEyes('center');
-}
-
-/* ── Robot Animations ── */
-function startRandomActions() {
-  const svg = document.getElementById('robotSvg');
-  const st = document.getElementById('screenText');
-  const texts = ['BUSCANDO...','HACKEANDO...','01101001','CNPJ OK','RECEITA?','LOADING...','BEEP BOOP'];
-  actionTimer = setInterval(() => {
-    const act = Math.floor(Math.random()*4);
-    if (act === 0) { setFoxPose('wave','spin'); setTimeout(returnToIdle, 900); }
-    else if (act === 1) { /* hold idle */ }
-    else if (act === 2) { if (st) st.textContent = texts[Math.floor(Math.random()*texts.length)]; }
-    else if (act === 3) { setFoxPose('laugh','shake'); setTimeout(returnToIdle, 1000); }
-  }, 3000);
-}
-
-function stopRandomActions() {
-  clearInterval(actionTimer);
-  actionTimer = null;
-}
-
-function addFloatingIcon() {
-  const icons = ['?','!','#','*','>','<','{','}','$','@'];
-  const c = document.getElementById('floatIcons');
-  const el = document.createElement('span');
-  el.className = 'float-icon';
-  el.textContent = icons[Math.floor(Math.random()*icons.length)];
-  el.style.left = (10+Math.random()*80)+'%';
-  el.style.bottom = '40px';
-  el.style.animationDelay = Math.random()*2+'s';
-  el.style.color = ['var(--grn)','var(--blu)','var(--yel)','var(--purple)'][Math.floor(Math.random()*4)];
-  c.appendChild(el);
-  setTimeout(() => el.remove(), 5000);
-}
-
-let floatIconTimer = null;
-function startFloatingIcons() {
-  floatIconTimer = setInterval(addFloatingIcon, 800);
-}
-function stopFloatingIcons() {
-  clearInterval(floatIconTimer);
-  floatIconTimer = null;
-  document.getElementById('floatIcons').innerHTML = '';
-}
-
-/* Fun facts */
-const funFacts = [
-  'O CNPJ foi criado em 1998, substituindo o antigo CGC.',
-  'Existem mais de 50 milhoes de CNPJs registrados no Brasil.',
-  'O CNPJ tem 14 digitos, sendo os 2 ultimos de verificacao.',
-  'A Receita Federal processa milhoes de consultas por dia.',
-  'O primeiro digito do CNPJ indica a regiao fiscal da empresa.',
-  'CNPJ com filial diferente de 0001 indica filial ou sucursal.',
-  'O MEI (Microempreendedor Individual) tambem tem CNPJ.',
-  'A consulta CNPJ e um servico publico e gratuito.',
-  'O capital social minimo para abrir empresa no Brasil e R$1.',
-  'Empresas inativas por mais de 5 anos podem ter CNPJ cancelado.'
-];
-let factIdx = 0;
-
-function startFunFacts() {
-  const el = document.getElementById('funFacts');
-  function showFact() {
-    el.innerHTML = '<div class="fun-fact"><strong>Voce sabia?</strong> ' + funFacts[factIdx % funFacts.length] + '</div>';
-    factIdx++;
-  }
-  showFact();
-  factTimer = setInterval(showFact, 4000);
-}
-function stopFunFacts() {
-  clearInterval(factTimer);
-  factTimer = null;
-  document.getElementById('funFacts').innerHTML = '';
-}
-
-/* Speech — updates bubble + triggers talking mouth-loop for the line's duration */
-function say(text) {
-  const b = document.getElementById('speechBubble');
-  b.style.animation = 'none';
-  void b.offsetWidth;
-  b.innerHTML = text;
-  b.style.animation = 'fadeInUp .3s ease-out';
-  // Roughly 70ms per character, min 1200ms, max 4500ms
-  const dur = Math.max(1200, Math.min(4500, (text || '').length * 70));
-  if (typeof startTalking === 'function') startTalking(dur);
-}
-
-/* Emoji pop */
-function popEmoji(emoji, opts) {
-  const c = document.getElementById('emojiPops');
-  if (!c) return;
-  const el = document.createElement('span');
-  el.className = 'emoji-pop' + (opts && opts.big ? ' big' : '');
-  el.textContent = emoji;
-  const spread = (opts && opts.spread) ? opts.spread : 40;
-  el.style.left = (50 + (Math.random() - 0.5) * spread) + '%';
-  el.style.top = '80px';
-  c.appendChild(el);
-  setTimeout(() => el.remove(), 2000);
-}
-
-/* Poke reactions (varied, Meu Talking Tom style) */
-const REACTIONS = [
-  {anim:'shake .4s ease-out', emoji:'😵', mouth:'open', dur:500, lines:[
-    'Ai! Meus transistores, cara!',
-    'Cuidado! Sou delicado, tenho circuito aqui dentro!',
-    'Ei, Robobruno tambem tem sentimentos!'
-  ]},
-  {anim:'jump .6s ease-out', emoji:'😲', mouth:'open', dur:650, lines:[
-    'Uou! Me assustou, meu!',
-    'Caramba, chegou chegando!',
-    'Eita! Quase curto-circuitei!'
-  ]},
-  {anim:'tickleShake .6s ease-in-out', emoji:'😂', mouth:'happy', dur:650, lines:[
-    'Hahaha! Faz cocegas nao!',
-    'Para! Meu CPU nao aguenta rir tanto!',
-    'HAHA! Meus pixels estao chorando de rir!'
-  ]},
-  {anim:'wiggle .5s ease-in-out', emoji:'🙄', mouth:'flat', dur:550, lines:[
-    'Serio? De novo?',
-    'Voce nao tem CNPJ pra consultar nao?',
-    'Robobruno nao e brinquedo, viu?'
-  ]},
-  {anim:'celebrate .6s ease-out', emoji:'🤩', mouth:'happy', dur:700, lines:[
-    'Oba! Atencao pro Robobruno!',
-    'Isso ai! Sou o melhor robo da Receita!',
-    'Sou fofinho, eu sei!'
-  ]},
-  {anim:'spin .7s linear', emoji:'💫', mouth:'open', dur:750, lines:[
-    'Eita! Fiquei tonto!',
-    'Estou girando... como minha cabeca!',
-    'Woooosh! La vou eu!'
-  ]}
-];
-
-const ANGRY_REACTIONS = [
-  {anim:'shake .3s ease-out 3', emoji:'😡', mouth:'flat', dur:1000, angry:true, lines:[
-    'CHEGA! Voce esta me irritando!',
-    'Para com isso ou eu entro em modo desligar!',
-    'Robobruno esta furioso! Recue!'
-  ]},
-  {anim:'shake .3s ease-out 3', emoji:'🤬', mouth:'flat', dur:1000, angry:true, lines:[
-    'Quer brigar? Tenho 8 bits de raiva!',
-    'Mais um clique e eu chamo o antivirus!',
-    'Modo combate ativado! Saia daqui!'
-  ]}
-];
-
-/* Robobruno state machine: mouth + whole-body anim driven by current state. */
-const STATE_MOUTH = {
-  idle: 'happy', wave: 'happy', laugh: 'open', celebrate: 'open',
-  angry: 'flat', sad: 'sad', surprise: 'open', think: 'smirk',
-  talk_open: 'open', talk_closed: 'flat'
-};
-const STATE_ANIM = {
-  idle: 'robotFloat 3s ease-in-out infinite',
-  wave: 'celebrate .7s ease-out',
-  laugh: 'tickleShake .7s ease-in-out',
-  celebrate: 'celebrate .8s ease-out',
-  angry: 'shake .4s ease-out',
-  sad: 'sadDroop .6s ease-out forwards',
-  surprise: 'jump .5s ease-out',
-  think: 'wiggle .6s ease-in-out'
-};
-
-let foxReturnTimer = null;
-let talkLoopTimer = null;
-let currentFoxState = 'idle';
-
-function setFoxPose(state, _effect) {
-  const svg = document.getElementById('robotSvg');
-  if (!svg) return;
-  currentFoxState = state;
-  setMouth(STATE_MOUTH[state] || 'happy');
-  const anim = STATE_ANIM[state];
-  if (anim) {
-    svg.style.animation = anim;
-    // Return to idle float after one-shot animations (except for idle/sad)
-    if (state !== 'idle' && state !== 'sad') {
-      clearTimeout(svg._animReset);
-      svg._animReset = setTimeout(() => {
-        svg.style.animation = STATE_ANIM.idle;
-      }, 900);
-    }
-  }
-}
-
-function returnToIdle() {
-  stopTalking();
-  setFoxPose('idle');
-}
-
-/* Talking mouth-loop: flip between open and flat/smirk mouth every 160ms while speaking. */
-function startTalking(durationMs) {
-  stopTalking();
-  let open = true;
-  setMouth('open');
-  talkLoopTimer = setInterval(() => {
-    open = !open;
-    setMouth(open ? 'open' : 'smirk');
-  }, 160);
-  if (durationMs) setTimeout(stopTalking, durationMs);
-}
-
-function stopTalking() {
-  if (talkLoopTimer) { clearInterval(talkLoopTimer); talkLoopTimer = null; }
-  // Restore mouth to current state's default
-  setMouth(STATE_MOUTH[currentFoxState] || 'happy');
-}
-
-function playReaction(r) {
-  const img = document.getElementById('robotSvg');
-  if (r.angry && img) {
-    img.classList.add('robot-angry');
-    setTimeout(() => img.classList.remove('robot-angry'), 2000);
-  }
-  // Map animation hint + emoji → best-matching pose
-  const name = (r.anim || '').split(' ')[0];
-  let pose = 'idle';
-  let effect = 'shake';
-  const emoji = r.emoji || '';
-  if (r.angry)                                        { pose = 'angry';     effect = 'shake'; }
-  else if (name === 'celebrate' || name === 'jump')   { pose = 'celebrate'; effect = 'bounce'; }
-  else if (name === 'tickleShake' || emoji === '😂')  { pose = 'laugh';     effect = 'shake'; }
-  else if (emoji === '😲' || emoji === '😵')           { pose = 'surprise';  effect = 'bounce'; }
-  else if (emoji === '🙄' || emoji === '😎')           { pose = 'think';     effect = 'spin'; }
-  else if (name === 'spin' || name === 'wiggle')     { pose = 'wave';      effect = 'spin'; }
-  else                                                { pose = 'wave';      effect = 'shake'; }
-
-  setFoxPose(pose, effect);
-  popEmoji(r.emoji);
-  say(r.lines[Math.floor(Math.random() * r.lines.length)]);
-
-  clearTimeout(foxReturnTimer);
-  foxReturnTimer = setTimeout(returnToIdle, (r.dur || 600) + 600);
-}
-
-function pokeRobot() {
-  const now = Date.now();
-  if (now - lastPokeAt > 3000) pokeCount = 0;
-  lastPokeAt = now;
-  pokeCount++;
-  if (pokeCount >= 5) {
-    playReaction(ANGRY_REACTIONS[Math.floor(Math.random() * ANGRY_REACTIONS.length)]);
-  } else {
-    // Merge general + part-specific reactions for more variety with the image mascot
-    const pool = REACTIONS.concat(Object.values(PART_REACTIONS));
-    playReaction(pool[Math.floor(Math.random() * pool.length)]);
-  }
-}
-
-/* Part-specific reactions */
-const PART_REACTIONS = {
-  partHead: {anim:'wiggle .5s ease-in-out', emoji:'🧠', mouth:'open', dur:550, lines:[
-    'Ai minha cabeca! Tem muito CNPJ aqui dentro!',
-    'Meu processador ta a mil, calma ai!',
-    'Nao mexe no cerebro, to pensando!'
-  ]},
-  partChest: {anim:'jump .5s ease-out', emoji:'💙', mouth:'happy', dur:600, lines:[
-    'BEEP! BOOP! Coracao de robo!',
-    'Ai, meu painel de controle!',
-    'Esse e meu botao favorito!'
-  ]},
-  partAntenna: {anim:'shake .3s ease-out 2', emoji:'📡', mouth:'open', dur:700, lines:[
-    'EI! Isso e meu WiFi!',
-    'Perdi o sinal! To offline!',
-    'Minha antena! Como vou falar com a Receita agora?'
-  ]},
-  leftArm: {anim:'celebrate .6s ease-out', emoji:'👋', mouth:'happy', dur:700, lines:[
-    'Oi! Oi! Tchau! Oi de novo!',
-    'Gosta do meu aceno? Treinei muito!',
-    'Aperta minha mao, sou um robo educado!'
-  ]},
-  rightArm: {anim:'wiggle .5s ease-in-out', emoji:'💪', mouth:'happy', dur:600, lines:[
-    'Olha meu biceps de aluminio!',
-    'Quer ver forca? Levanto 3 CNPJs com um braco so!',
-    'Flexiona comigo! Vai, forca!'
-  ]},
-  leftLeg: {anim:'jump .5s ease-out', emoji:'🦿', mouth:'open', dur:600, lines:[
-    'Ai! Minha perna! Nao chuta, nao!',
-    'Eu nao corro, eu teleprocesso!',
-    'Essa perna ainda ta na garantia, viu?'
-  ]},
-  rightLeg: {anim:'spin .6s linear', emoji:'🕺', mouth:'happy', dur:650, lines:[
-    'Dancinha do Robobruno! Uh uh uh!',
-    'Quer ver eu dancando? Olha!',
-    'Acho que vou abrir um canal de danca.'
-  ]}
-};
-
-function wireBodyParts() {
-  Object.keys(PART_REACTIONS).forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.addEventListener('click', function(e) {
-      e.stopPropagation();
-      // still count as poke for rage escalation
-      const now = Date.now();
-      if (now - lastPokeAt > 3000) pokeCount = 0;
-      lastPokeAt = now;
-      pokeCount++;
-      if (pokeCount >= 5) {
-        playReaction(ANGRY_REACTIONS[Math.floor(Math.random() * ANGRY_REACTIONS.length)]);
-      } else {
-        playReaction(PART_REACTIONS[id]);
-      }
-    });
-  });
-}
-
-/* Mouse-follow eyes: pupils track cursor */
-let mouseFollowActive = true;
-let lastOrbitUpdate = 0;
-function initEyeTracking() {
-  const svg = document.getElementById('robotSvg');
-  if (!svg) return;
-  document.addEventListener('mousemove', function(e) {
-    if (!mouseFollowActive || isSearching) return;
-    const now = Date.now();
-    if (now - lastOrbitUpdate < 40) return;
-    lastOrbitUpdate = now;
-    const lp = document.getElementById('leftPupil');
-    const rp = document.getElementById('rightPupil');
-    if (!lp || !rp) return;
-    const rect = svg.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const dx = e.clientX - cx;
-    const dy = e.clientY - cy;
-    const dist = Math.max(1, Math.sqrt(dx*dx + dy*dy));
-    const offX = Math.max(-5, Math.min(5, (dx / dist) * 5));
-    const offY = Math.max(-5, Math.min(5, (dy / dist) * 5));
-    lp.setAttribute('cx', 67 + offX);
-    lp.setAttribute('cy', 51 + offY);
-    rp.setAttribute('cx', 117 + offX);
-    rp.setAttribute('cy', 51 + offY);
-  });
-}
-
-/* Input-focus reaction — Robobruno perks up when you start typing */
-function initInputReactions() {
-  const input = document.getElementById('cnpjInput');
-  if (!input) return;
-  input.addEventListener('focus', function() {
-    if (isSearching) return;
-    setFoxPose('wave', 'bounce');
-    popEmoji('👀');
-    say('Opa! Vai digitar? To de olho!');
-    clearTimeout(foxReturnTimer);
-    foxReturnTimer = setTimeout(returnToIdle, 2200);
-  });
-  input.addEventListener('input', function() {
-    if (isSearching) return;
-    // No-op blink for image mascot
-  });
-}
-
-/* Idle trash-talk (when not searching) */
-const IDLE_QUIPS = [
-  'Cade meu cafe? Quer dizer, minha bateria...',
-  'To aqui parado, vamos consultar alguem?',
-  'Sou o Robobruno, CNPJ e comigo mesmo!',
-  'Ja pensou em quantos CNPJs ja existiram? Eu pensei. Varios.',
-  'To com vontade de consultar um CNPJ agora...',
-  'Voce sabia que eu nunca durmo? E isso cansa, viu!',
-  'Psiu! Digita um CNPJ ai, to com tempo!',
-  'Ser robo da Receita e solitario, sabia?',
-  'Meu firmware esta atualizado, pode confiar!',
-  'Ja tomei 3 cafes hoje... digo, 3 cargas de bateria!',
-  'Se voce nao digitar um CNPJ, eu vou dormir no teclado!',
-  'Robobruno esta pronto! So me dar um numero!',
-  'Cada CNPJ tem uma historia. Me conte uma!',
-  'Nao sou paranoico, mas a Receita ta sempre observando...',
-  'Voce ai do outro lado da tela, oi!'
-];
-
-const IDLE_SCREEN_TEXTS = ['ROBOBRUNO', 'ON-LINE', 'READY', 'V3.0', 'AGUARDANDO', 'CAFE?', 'BEEP', 'SISTEMAS OK'];
-
-function startIdleChatter() {
-  stopIdleChatter();
-  const st = document.getElementById('screenText');
-  // Quip rotation
-  idleChatterTimer = setInterval(() => {
-    if (isSearching) return;
-    // Rotate speech every other tick; chest text every tick
-    if (Math.random() < 0.6) {
-      say(IDLE_QUIPS[Math.floor(Math.random() * IDLE_QUIPS.length)]);
-    }
-    if (st) st.textContent = IDLE_SCREEN_TEXTS[Math.floor(Math.random() * IDLE_SCREEN_TEXTS.length)];
-  }, 7000);
-  // Idle blink (slow, natural)
-  idleBlinkTimer = setInterval(() => {
-    if (!isSearching) blinkEyes();
-  }, 4000);
-}
-
-function stopIdleChatter() {
-  clearInterval(idleChatterTimer);
-  clearInterval(idleBlinkTimer);
-  idleChatterTimer = null;
-  idleBlinkTimer = null;
-}
-
-/* Robot mouth states */
-function setMouth(state) {
-  const mp = document.getElementById('mouthPath');
-  if (!mp) return;
-  if (state === 'happy')      mp.setAttribute('d', 'M72 74 Q90 86 108 74');
-  else if (state === 'sad')   mp.setAttribute('d', 'M72 82 Q90 72 108 82');
-  else if (state === 'open')  mp.setAttribute('d', 'M76 74 Q90 86 104 74 Q90 90 76 74');
-  else if (state === 'flat')  mp.setAttribute('d', 'M74 78 L106 78');
-  else if (state === 'smirk') mp.setAttribute('d', 'M74 78 Q90 82 108 74');
-  else                        mp.setAttribute('d', 'M72 74 Q90 86 108 74');
 }
 
 /* ── Confetti ── */
@@ -750,36 +609,20 @@ function startLookup() {
   }
   inputError.textContent = '';
   companyData = null;
-  isSearching = true;
+  window.isSearching = true;
 
   // Disable search
   document.getElementById('searchBtn').disabled = true;
   cnpjInput.disabled = true;
 
-  // Hide results, show mascot
+  // Hide results
   document.getElementById('resultsArea').classList.remove('active');
   document.getElementById('resultsArea').innerHTML = '';
 
-  // Start robot animations (pause idle chatter during search)
-  stopIdleChatter();
-  setFoxPose('think');
-  startEyeMovement();
-  startRandomActions();
-  startFloatingIcons();
-  startFunFacts();
+  // Tell TED we're searching
+  if (window.ted) ted.say('Consultando na Receita...', 'pointing_right');
 
-  const screenText = document.getElementById('screenText');
-  if (screenText) screenText.textContent = 'CONSULTANDO...';
-
-  const searchLines = [
-    'Hmm, deixa eu hackear... quer dizer, consultar os dados...',
-    'Conectando com a Receita Federal... eles sao lentos, nao eu!',
-    'Vasculhando bancos de dados... isso e mais facil que sudoku!'
-  ];
-  say(searchLines[Math.floor(Math.random()*searchLines.length)]);
-
-  // SSE lookup. Supabase Storage serves this HTML but won't proxy the function call,
-  // so when we're on Supabase Storage (or any non-local host) we hit the Edge Function absolute URL.
+  // SSE lookup
   const HOST = window.location.hostname;
   const IS_LOCAL = HOST === 'localhost' || HOST === '127.0.0.1';
   const streamUrl = IS_LOCAL
@@ -789,106 +632,54 @@ function startLookup() {
 
   es.addEventListener('status', function(e) {
     const d = JSON.parse(e.data);
-    const statusMsgs = [
-      'Hmm, deixa eu hackear... quer dizer, consultar os dados...',
-      'Conectando com a Receita Federal... eles sao lentos, nao eu!',
-      'Vasculhando bancos de dados... isso e mais facil que sudoku!',
-      'Quase la! Os servidores do governo estao cooperando hoje...',
-      'Decifrando bytes... isso e fichinha pra mim!'
-    ];
-    say(d.message || d.msg || statusMsgs[Math.floor(Math.random()*statusMsgs.length)]);
+    if (window.ted) ted.say(d.message || d.msg, 'pointing_right');
   });
 
   es.addEventListener('result', function(e) {
     companyData = JSON.parse(e.data);
+    if (window.ted) ted.onEvent('lookup_result', {
+      razaoSocial: companyData.razao_social,
+      situacao: companyData.situacao_cadastral,
+      uf: companyData.uf,
+      ie: companyData.inscricao_estadual
+    });
   });
 
   es.addEventListener('done', function(e) {
     es.close();
-    isSearching = false;
-    stopRandomActions();
-    stopFloatingIcons();
-    stopFunFacts();
-    stopEyeMovement();
-    startIdleChatter();
-
-    const screenText = document.getElementById('screenText');
-    if (screenText) screenText.textContent = 'ROBOBRUNO';
-
-    const svg = document.getElementById('robotSvg');
+    window.isSearching = false;
 
     if (!companyData) {
-      setFoxPose('sad');
-      say('Poxa... nao achei esse CNPJ. Me da outro, vai?');
-      popEmoji('😔', {big:true});
-      clearTimeout(foxReturnTimer);
-      foxReturnTimer = setTimeout(returnToIdle, 2500);
+      if (window.ted) ted.say('Não achei nada, rapaz...', 'sad');
       enableSearch();
       return;
     }
 
-    const name = companyData.razao_social || companyData.nome_fantasia || 'essa empresa';
-    const ie = (companyData.inscricao_estadual || '').trim();
-
-    if (ie) {
-      say('ACHEI! ' + name + ' com IE ' + ie + '. Robobruno entrega!');
-      popEmoji('🎉', {big:true});
-      setTimeout(() => popEmoji('✨', {spread:80}), 200);
-      setTimeout(() => popEmoji('🦊', {spread:80}), 400);
-      setTimeout(() => popEmoji('💚', {spread:80}), 600);
-      setFoxPose('celebrate','bounce');
-      clearTimeout(foxReturnTimer);
-      foxReturnTimer = setTimeout(returnToIdle, 2200);
-      launchConfetti();
-    } else {
-      setFoxPose('surprise');
-      say('Achei ' + name + ', mas cade a IE? ' +
-          (companyData._ie_unavailable_reason || 'Fonte nao retornou IE') + '.');
-      popEmoji('🤨', {big:true});
-      setTimeout(() => popEmoji('❓', {spread:60}), 300);
-      clearTimeout(foxReturnTimer);
-      foxReturnTimer = setTimeout(returnToIdle, 2500);
-    }
-
+    if (window.ted) ted.react('happy');
+    launchConfetti();
     showResults();
     enableSearch();
   });
 
   es.addEventListener('error', function(e) {
     es.close();
-    isSearching = false;
-    stopRandomActions();
-    stopFloatingIcons();
-    stopFunFacts();
-    startIdleChatter();
+    window.isSearching = false;
 
-    let errMsg = 'Eita! Deu ruim na consulta. Os servidores devem estar no cafe...';
+    let errMsg = 'Deu ruim na consulta...';
     try {
       const d = JSON.parse(e.data);
       const m = d && (d.message || d.msg);
       if (m) errMsg = 'Erro: ' + m;
     } catch(_) {}
-    setFoxPose('sad');
-    say(errMsg);
-    popEmoji('😫', {big:true});
-    clearTimeout(foxReturnTimer);
-    foxReturnTimer = setTimeout(returnToIdle, 3000);
+    if (window.ted) ted.onEvent('lookup_error', { message: errMsg });
     enableSearch();
   });
 
   es.onerror = function() {
     es.close();
-    if (isSearching) {
-      isSearching = false;
-      stopRandomActions();
-      stopFloatingIcons();
-      stopFunFacts();
-      startIdleChatter();
-      setFoxPose('sad');
-      say('A conexao caiu! Robobruno esta sozinho aqui...');
-      popEmoji('📡', {big:true});
-      clearTimeout(foxReturnTimer);
-      foxReturnTimer = setTimeout(returnToIdle, 3000);
+    if (window.isSearching) {
+      window.isSearching = false;
+      if (window.ted) ted.say('A conexão caiu!', 'sad');
       enableSearch();
     }
   };
@@ -930,8 +721,6 @@ function showResults() {
     {label:'Email', value: d.email || '-'},
   ];
 
-  // IE card — always render. Value is strictly what SintegraWS returned,
-  // or the explicit unavailable reason. Never synthesized.
   if (ie) {
     cards.push({
       label: 'Inscricao Estadual',
@@ -984,17 +773,10 @@ function enableSearch() {
 
 function resetAll() {
   companyData = null;
-  isSearching = false;
-  stopEyeMovement();
-  stopRandomActions();
-  stopFloatingIcons();
-  stopFunFacts();
+  window.isSearching = false;
 
   document.getElementById('resultsArea').classList.remove('active');
   document.getElementById('resultsArea').innerHTML = '';
-
-  const screenText = document.getElementById('screenText');
-  if (screenText) screenText.textContent = 'ROBOBRUNO';
 
   cnpjInput.value = '';
   cnpjInput.disabled = false;
@@ -1002,30 +784,30 @@ function resetAll() {
   inputError.textContent = '';
   cnpjInput.focus();
   window.scrollTo({top:0, behavior:'smooth'});
-
-  // Show intro again
-  showIntro();
 }
 
-/* ── Intro on page load ── */
-function showIntro() {
-  say('Ola! Eu sou o Robobruno, seu assistente robotico de CNPJ! Digite um numero ai e eu acho tudinho pra voce, ate a Inscricao Estadual. Pode me cutucar tambem, eu reajo!');
-  setMouth('happy');
-  popEmoji('👋');
-  setTimeout(() => {
-    if (!isSearching) {
-      say('To esperando, viu? Digita um CNPJ ai!');
-      setMouth('flat');
-      startIdleChatter();
-    }
-  }, 5000);
-}
+/* ── Initialize TED ── */
+document.addEventListener('DOMContentLoaded', () => {
+  const HOST = window.location.hostname;
+  const IS_LOCAL = HOST === 'localhost' || HOST === '127.0.0.1';
 
-// Wire up interactivity + run intro on page load
-wireBodyParts();
-initEyeTracking();
-initInputReactions();
-showIntro();
+  window.ted = TED.init(document.getElementById('ted-container'), {
+    videosUrl: IS_LOCAL
+      ? '/mascot-assets/'
+      : 'https://antgruwugsizmtcfjglo.supabase.co/storage/v1/object/public/mascot-assets/',
+    trashTalkEndpoint: IS_LOCAL
+      ? '/api/trash-talk'
+      : 'https://antgruwugsizmtcfjglo.supabase.co/functions/v1/debora/api/trash-talk',
+  });
+
+  // Greet user on page load
+  ted.onEvent('page_load', { pageName: 'Debora 3#' });
+
+  // Idle chatter every 20s
+  setInterval(() => {
+    if (!window.isSearching) ted.onEvent('idle_tick', {});
+  }, 20000);
+});
 </script>
 </body>
 </html>
