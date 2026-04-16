@@ -1,0 +1,1031 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Debora 3# — Consulta CNPJ</title>
+<style>
+:root{--bg:#0a0c14;--panel:#12151f;--alt:#151823;--line:#1f2433;--mut:#8a93a6;--grn:#00d4aa;--blu:#3b82f6;--red:#ef4444;--yel:#f59e0b;--purple:#a78bfa}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:#e6e9f0;font-family:Inter,system-ui,-apple-system,sans-serif;font-size:14px;min-height:100vh;overflow-x:hidden}
+
+header{padding:24px 28px;border-bottom:1px solid var(--line);background:var(--panel);text-align:center}
+header h1{font-size:24px;font-weight:700;letter-spacing:-0.5px}
+header h1 span{color:var(--grn)}
+header p{margin:6px 0 0;color:var(--mut);font-size:13px}
+
+/* ── Two-column page layout ── */
+.page-layout{display:flex;min-height:calc(100vh - 82px);align-items:stretch}
+.robot-column{flex:0 0 42%;max-width:560px;background:linear-gradient(180deg,#0d1018 0%,#12151f 100%);border-right:1px solid var(--line);padding:24px 20px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;position:sticky;top:0;height:calc(100vh - 82px);overflow:hidden}
+.content-column{flex:1 1 auto;padding:0 0 60px;overflow-x:hidden}
+@media(max-width:900px){
+  .page-layout{flex-direction:column}
+  .robot-column{flex:0 0 auto;max-width:100%;width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid var(--line);padding:20px 16px}
+}
+
+.search-area{max-width:560px;margin:40px auto 0;padding:0 24px}
+.search-box{display:flex;gap:8px}
+.search-box input{flex:1;background:#1c2030;border:2px solid var(--line);color:#e6e9f0;padding:16px 20px;border-radius:14px;font-size:18px;font-family:ui-monospace,Menlo,monospace;letter-spacing:2px;outline:none;transition:border-color .2s}
+.search-box input:focus{border-color:var(--blu)}
+.search-box input::placeholder{color:#555d70;letter-spacing:0;font-family:Inter,system-ui,sans-serif;font-size:14px}
+.search-box button{background:var(--grn);border:none;color:#0a0c14;padding:16px 28px;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .2s}
+.search-box button:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.search-box button:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.input-error{color:var(--red);font-size:12px;margin-top:6px;text-align:center;min-height:18px}
+.search-hint{color:var(--mut);font-size:12px;text-align:center;margin-top:10px}
+
+/* ── Mascot Area ── */
+.mascot-area{width:100%;max-width:520px;margin:0 auto;text-align:center;display:flex;flex-direction:column;align-items:center;flex:1}
+
+.robot-stage{position:relative;width:100%;padding:10px 0 10px;display:flex;flex-direction:column;align-items:center;flex:1;justify-content:center}
+
+/* Robobruno SVG */
+#robotSvg{cursor:pointer;transition:transform .15s;width:320px;height:auto;max-width:90%;display:block;filter:drop-shadow(0 14px 22px rgba(0,0,0,.28))}
+#robotSvg:active{transform:scale(0.97)}
+#robotSvg .clickable{cursor:pointer}
+#robotSvg .clickable:hover{filter:brightness(1.12)}
+@media(max-width:900px){#robotSvg{width:230px}}
+
+/* Speech bubble */
+.speech-bubble{background:var(--panel);border:2px solid var(--line);border-radius:20px;padding:18px 26px;margin:0 auto;max-width:540px;font-size:17px;line-height:1.5;color:#e6e9f0;position:relative;min-height:52px;display:flex;align-items:center;justify-content:center;animation:fadeInUp .3s ease-out;margin-top:16px}
+.speech-bubble::before{content:'';position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:10px solid var(--line)}
+.speech-bubble::after{content:'';position:absolute;top:-7px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:8px solid var(--panel)}
+
+/* Fun facts */
+.fun-facts{margin-top:14px;padding:0 20px;min-height:24px}
+.fun-fact{color:var(--mut);font-size:13px;animation:fadeInUp .4s ease-out}
+.fun-fact strong{color:var(--yel)}
+
+/* Float icons (during search) */
+.float-icons{position:absolute;width:100%;height:100%;top:0;left:0;pointer-events:none}
+.float-icon{position:absolute;font-size:20px;opacity:0;animation:iconFloat 4s ease-out infinite}
+
+/* Emoji reaction pop (poke, results) */
+.emoji-pops{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:5}
+.emoji-pop{position:absolute;font-size:30px;opacity:0;animation:emojiPop 1.4s ease-out forwards;filter:drop-shadow(0 2px 4px rgba(0,0,0,.4))}
+.emoji-pop.big{font-size:48px;animation-duration:1.8s}
+
+/* Angry eyes overlay */
+.robot-angry #leftPupil, .robot-angry #rightPupil{fill:#ef4444 !important}
+
+
+/* ── Results ── */
+.results-area{max-width:640px;margin:32px auto 0;padding:0 24px 60px;display:none}
+.results-area.active{display:block}
+
+.result-header{text-align:center;margin-bottom:24px;animation:fadeInUp .4s ease-out}
+.result-company{font-size:22px;font-weight:700;margin-bottom:8px}
+.result-badge{display:inline-block;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:1px}
+.badge-ativa{background:rgba(0,212,170,.15);color:var(--grn);border:1px solid rgba(0,212,170,.3)}
+.badge-suspensa{background:rgba(245,158,11,.15);color:var(--yel);border:1px solid rgba(245,158,11,.3)}
+.badge-inapta{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.badge-baixada{background:rgba(138,147,166,.15);color:var(--mut);border:1px solid rgba(138,147,166,.3)}
+
+.result-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:560px){.result-cards{grid-template-columns:1fr}}
+.result-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 18px;animation:fadeInUp .4s ease-out}
+.result-card.ie-card{border-color:var(--purple);box-shadow:0 0 12px rgba(167,139,250,.15)}
+.result-card-label{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.result-card-value{font-size:15px;font-weight:600;word-break:break-word}
+.result-card.full-width{grid-column:1/-1}
+
+.new-search-btn{margin-top:28px;text-align:center}
+.new-search-btn button{background:var(--blu);border:none;color:#fff;padding:14px 32px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s}
+.new-search-btn button:hover{filter:brightness(1.15);transform:translateY(-1px)}
+
+/* Confetti */
+.confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999}
+.confetti-piece{position:absolute;width:8px;height:8px;top:-10px;animation:confettiFall 3s ease-in forwards}
+
+/* ── Animations ── */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes dotPulse{0%,80%,100%{opacity:.3}40%{opacity:1}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes antennaPulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+@keyframes iconFloat{0%{opacity:0;transform:translateY(0)}15%{opacity:.7}85%{opacity:.7}100%{opacity:0;transform:translateY(-180px)}}
+@keyframes celebrate{0%{transform:scale(1)}25%{transform:scale(1.1) rotate(-3deg)}50%{transform:scale(1.15) rotate(3deg)}75%{transform:scale(1.1) rotate(-2deg)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes jump{0%,100%{transform:translateY(0)}40%{transform:translateY(-20px)}60%{transform:translateY(-20px)}}
+@keyframes confettiFall{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+@keyframes robotFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes waveArm{0%,100%{transform:rotate(0deg)}25%{transform:rotate(-20deg)}75%{transform:rotate(20deg)}}
+@keyframes emojiPop{0%{opacity:0;transform:translate(-50%,0) scale(.5)}20%{opacity:1;transform:translate(-50%,-30px) scale(1.2)}50%{opacity:1;transform:translate(-50%,-70px) scale(1)}100%{opacity:0;transform:translate(-50%,-130px) scale(.9)}}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+@keyframes tickleShake{0%,100%{transform:translateX(0)}10%{transform:translateX(-3px)}20%{transform:translateX(3px)}30%{transform:translateX(-3px)}40%{transform:translateX(3px)}50%{transform:translateX(-3px)}60%{transform:translateX(3px)}70%{transform:translateX(-3px)}80%{transform:translateX(3px)}90%{transform:translateX(-3px)}}
+@keyframes sadDroop{0%{transform:translateY(0)}100%{transform:translateY(3px) rotate(-2deg)}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Debora <span>3#</span></h1>
+  <p>Consulta CNPJ com dados completos da Receita Federal</p>
+</header>
+
+<div class="page-layout">
+<aside class="robot-column">
+
+<div class="mascot-area" id="mascotArea">
+  <div class="robot-stage" id="stage">
+    <div class="float-icons" id="floatIcons"></div>
+    <div class="emoji-pops" id="emojiPops"></div>
+    <svg id="robotSvg" onclick="pokeRobot()" width="180" height="210" viewBox="0 0 180 210" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation:robotFloat 3s ease-in-out infinite">
+      <!-- Antenna -->
+      <line x1="90" y1="18" x2="90" y2="0" stroke="#8a93a6" stroke-width="3" stroke-linecap="round" pointer-events="none"/>
+      <circle id="partAntenna" class="clickable" cx="90" cy="0" r="6" fill="#3b82f6" opacity="0.85">
+        <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/>
+        <animate attributeName="r" values="5;7;5" dur="1.5s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Head -->
+      <rect id="partHead" class="clickable" x="35" y="18" width="110" height="72" rx="28" ry="28" fill="#e8ecf0" stroke="#d0d5dd" stroke-width="2"/>
+      <rect x="45" y="24" width="90" height="30" rx="15" fill="#fff" opacity="0.35" pointer-events="none"/>
+
+      <!-- Left eye -->
+      <circle class="eye-part" cx="65" cy="52" r="14" fill="#3b82f6"/>
+      <circle class="eye-part" cx="65" cy="52" r="10" fill="#2563eb"/>
+      <circle id="leftPupil" cx="67" cy="51" r="5" fill="#fff"/>
+
+      <!-- Right eye -->
+      <circle class="eye-part" cx="115" cy="52" r="14" fill="#3b82f6"/>
+      <circle class="eye-part" cx="115" cy="52" r="10" fill="#2563eb"/>
+      <circle id="rightPupil" cx="117" cy="51" r="5" fill="#fff"/>
+
+      <!-- Mouth (state-driven) -->
+      <path id="mouthPath" d="M72 74 Q90 86 108 74" stroke="#00d4aa" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+      <!-- Neck -->
+      <rect x="80" y="88" width="20" height="10" rx="4" fill="#d0d5dd"/>
+
+      <!-- Body -->
+      <rect x="45" y="96" width="90" height="68" rx="18" fill="#e8ecf0" stroke="#d0d5dd" stroke-width="2"/>
+      <rect x="55" y="102" width="70" height="24" rx="10" fill="#fff" opacity="0.3"/>
+
+      <!-- Chest screen -->
+      <rect id="partChest" class="clickable" x="62" y="118" width="56" height="28" rx="8" fill="#151823" stroke="#3b82f6" stroke-width="1.5"/>
+      <text id="screenText" x="90" y="137" text-anchor="middle" fill="#00d4aa" font-family="monospace" font-size="10" pointer-events="none">ROBOBRUNO</text>
+
+      <!-- Left arm (waving) -->
+      <g id="leftArm" class="clickable" transform-origin="50 102" style="animation:waveArm 2s ease-in-out infinite">
+        <rect x="20" y="102" width="28" height="10" rx="5" fill="#d0d5dd"/>
+        <circle cx="18" cy="107" r="7" fill="#e8ecf0" stroke="#d0d5dd" stroke-width="1.5"/>
+      </g>
+
+      <!-- Right arm -->
+      <g id="rightArm" class="clickable">
+        <rect x="132" y="102" width="28" height="10" rx="5" fill="#d0d5dd"/>
+        <circle cx="162" cy="107" r="7" fill="#e8ecf0" stroke="#d0d5dd" stroke-width="1.5"/>
+      </g>
+
+      <!-- Left leg -->
+      <g id="leftLeg" class="clickable">
+        <rect x="58" y="162" width="22" height="14" rx="7" fill="#d0d5dd" stroke="#bcc2cc" stroke-width="1"/>
+        <rect x="54" y="174" width="30" height="12" rx="6" fill="#e8ecf0" stroke="#d0d5dd" stroke-width="1.5"/>
+      </g>
+
+      <!-- Right leg -->
+      <g id="rightLeg" class="clickable">
+        <rect x="100" y="162" width="22" height="14" rx="7" fill="#d0d5dd" stroke="#bcc2cc" stroke-width="1"/>
+        <rect x="96" y="174" width="30" height="12" rx="6" fill="#e8ecf0" stroke="#d0d5dd" stroke-width="1.5"/>
+      </g>
+
+      <!-- Body accent -->
+      <line x1="70" y1="150" x2="110" y2="150" stroke="#3b82f6" stroke-width="1" opacity="0.4"/>
+      <line x1="75" y1="155" x2="105" y2="155" stroke="#3b82f6" stroke-width="1" opacity="0.3"/>
+    </svg>
+  </div>
+
+  <div class="speech-bubble" id="speechBubble">Preparando consulta...</div>
+
+  <div class="fun-facts" id="funFacts"></div>
+
+</div>
+
+</aside>
+
+<main class="content-column">
+
+<div class="search-area" id="searchArea">
+  <div class="search-box">
+    <input type="text" id="cnpjInput" placeholder="Digite o CNPJ..." maxlength="18" autocomplete="off">
+    <button id="searchBtn" onclick="startLookup()">CONSULTAR</button>
+  </div>
+  <div class="input-error" id="inputError"></div>
+  <div class="search-hint">Formato: XX.XXX.XXX/XXXX-XX</div>
+</div>
+
+<div class="results-area" id="resultsArea"></div>
+
+</main>
+</div>
+
+<script>
+/* ── State ── */
+let companyData = null;
+let walkTimer = null;
+let eyeTimer = null;
+let actionTimer = null;
+let factTimer = null;
+let idleChatterTimer = null;
+let idleBlinkTimer = null;
+let isSearching = false;
+let pokeCount = 0;
+let lastPokeAt = 0;
+
+/* ── CNPJ Validation ── */
+const cnpjInput = document.getElementById('cnpjInput');
+const inputError = document.getElementById('inputError');
+
+cnpjInput.addEventListener('input', function(e) {
+  let v = e.target.value.replace(/\D/g, '');
+  if (v.length > 14) v = v.slice(0, 14);
+  if (v.length > 12) v = v.slice(0,2)+'.'+v.slice(2,5)+'.'+v.slice(5,8)+'/'+v.slice(8,12)+'-'+v.slice(12);
+  else if (v.length > 8) v = v.slice(0,2)+'.'+v.slice(2,5)+'.'+v.slice(5,8)+'/'+v.slice(8);
+  else if (v.length > 5) v = v.slice(0,2)+'.'+v.slice(2,5)+'.'+v.slice(5);
+  else if (v.length > 2) v = v.slice(0,2)+'.'+v.slice(2);
+  e.target.value = v;
+  inputError.textContent = '';
+});
+
+cnpjInput.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') startLookup();
+});
+
+function validateCNPJ(cnpj) {
+  const d = cnpj.replace(/\D/g, '');
+  if (d.length !== 14) return false;
+  if (/^(\d)\1{13}$/.test(d)) return false;
+  const calc = (arr, digits) => {
+    let s = 0;
+    for (let i = 0; i < arr.length; i++) s += parseInt(digits[i]) * arr[i];
+    const r = s % 11;
+    return r < 2 ? 0 : 11 - r;
+  };
+  const w1 = [5,4,3,2,9,8,7,6,5,4,3,2];
+  const w2 = [6,5,4,3,2,9,8,7,6,5,4,3,2];
+  if (calc(w1, d) !== parseInt(d[12])) return false;
+  if (calc(w2, d) !== parseInt(d[13])) return false;
+  return true;
+}
+
+/* ── Robot eye animations ── */
+function moveEyes(dir) {
+  const lp = document.getElementById('leftPupil');
+  const rp = document.getElementById('rightPupil');
+  if (!lp || !rp) return;
+  if (dir === 'left')        { lp.setAttribute('cx','62'); rp.setAttribute('cx','112'); }
+  else if (dir === 'right')  { lp.setAttribute('cx','72'); rp.setAttribute('cx','122'); }
+  else if (dir === 'up')     { lp.setAttribute('cy','46'); rp.setAttribute('cy','46'); lp.setAttribute('cx','67'); rp.setAttribute('cx','117'); }
+  else if (dir === 'center') { lp.setAttribute('cx','67'); lp.setAttribute('cy','51'); rp.setAttribute('cx','117'); rp.setAttribute('cy','51'); }
+}
+
+function blinkEyes() {
+  const lp = document.getElementById('leftPupil');
+  const rp = document.getElementById('rightPupil');
+  const parts = document.querySelectorAll('#robotSvg .eye-part');
+  const all = [...parts, lp, rp].filter(Boolean);
+  all.forEach(el => {
+    el.setAttribute('transform', 'scale(1,0.1)');
+    el.setAttribute('transform-origin', el.getAttribute('cx') + ' ' + el.getAttribute('cy'));
+  });
+  setTimeout(() => all.forEach(el => el.removeAttribute('transform')), 200);
+}
+
+function startEyeMovement() {
+  const looks = ['center','left','right','up','blink','center'];
+  eyeTimer = setInterval(() => {
+    const cls = looks[Math.floor(Math.random()*looks.length)];
+    if (cls === 'blink') { blinkEyes(); }
+    else { moveEyes(cls); }
+  }, 1200);
+}
+
+function stopEyeMovement() {
+  clearInterval(eyeTimer);
+  eyeTimer = null;
+  moveEyes('center');
+}
+
+/* ── Robot Animations ── */
+function startRandomActions() {
+  const svg = document.getElementById('robotSvg');
+  const st = document.getElementById('screenText');
+  const texts = ['BUSCANDO...','HACKEANDO...','01101001','CNPJ OK','RECEITA?','LOADING...','BEEP BOOP'];
+  actionTimer = setInterval(() => {
+    const act = Math.floor(Math.random()*4);
+    if (act === 0) { setFoxPose('wave','spin'); setTimeout(returnToIdle, 900); }
+    else if (act === 1) { /* hold idle */ }
+    else if (act === 2) { if (st) st.textContent = texts[Math.floor(Math.random()*texts.length)]; }
+    else if (act === 3) { setFoxPose('laugh','shake'); setTimeout(returnToIdle, 1000); }
+  }, 3000);
+}
+
+function stopRandomActions() {
+  clearInterval(actionTimer);
+  actionTimer = null;
+}
+
+function addFloatingIcon() {
+  const icons = ['?','!','#','*','>','<','{','}','$','@'];
+  const c = document.getElementById('floatIcons');
+  const el = document.createElement('span');
+  el.className = 'float-icon';
+  el.textContent = icons[Math.floor(Math.random()*icons.length)];
+  el.style.left = (10+Math.random()*80)+'%';
+  el.style.bottom = '40px';
+  el.style.animationDelay = Math.random()*2+'s';
+  el.style.color = ['var(--grn)','var(--blu)','var(--yel)','var(--purple)'][Math.floor(Math.random()*4)];
+  c.appendChild(el);
+  setTimeout(() => el.remove(), 5000);
+}
+
+let floatIconTimer = null;
+function startFloatingIcons() {
+  floatIconTimer = setInterval(addFloatingIcon, 800);
+}
+function stopFloatingIcons() {
+  clearInterval(floatIconTimer);
+  floatIconTimer = null;
+  document.getElementById('floatIcons').innerHTML = '';
+}
+
+/* Fun facts */
+const funFacts = [
+  'O CNPJ foi criado em 1998, substituindo o antigo CGC.',
+  'Existem mais de 50 milhoes de CNPJs registrados no Brasil.',
+  'O CNPJ tem 14 digitos, sendo os 2 ultimos de verificacao.',
+  'A Receita Federal processa milhoes de consultas por dia.',
+  'O primeiro digito do CNPJ indica a regiao fiscal da empresa.',
+  'CNPJ com filial diferente de 0001 indica filial ou sucursal.',
+  'O MEI (Microempreendedor Individual) tambem tem CNPJ.',
+  'A consulta CNPJ e um servico publico e gratuito.',
+  'O capital social minimo para abrir empresa no Brasil e R$1.',
+  'Empresas inativas por mais de 5 anos podem ter CNPJ cancelado.'
+];
+let factIdx = 0;
+
+function startFunFacts() {
+  const el = document.getElementById('funFacts');
+  function showFact() {
+    el.innerHTML = '<div class="fun-fact"><strong>Voce sabia?</strong> ' + funFacts[factIdx % funFacts.length] + '</div>';
+    factIdx++;
+  }
+  showFact();
+  factTimer = setInterval(showFact, 4000);
+}
+function stopFunFacts() {
+  clearInterval(factTimer);
+  factTimer = null;
+  document.getElementById('funFacts').innerHTML = '';
+}
+
+/* Speech — updates bubble + triggers talking mouth-loop for the line's duration */
+function say(text) {
+  const b = document.getElementById('speechBubble');
+  b.style.animation = 'none';
+  void b.offsetWidth;
+  b.innerHTML = text;
+  b.style.animation = 'fadeInUp .3s ease-out';
+  // Roughly 70ms per character, min 1200ms, max 4500ms
+  const dur = Math.max(1200, Math.min(4500, (text || '').length * 70));
+  if (typeof startTalking === 'function') startTalking(dur);
+}
+
+/* Emoji pop */
+function popEmoji(emoji, opts) {
+  const c = document.getElementById('emojiPops');
+  if (!c) return;
+  const el = document.createElement('span');
+  el.className = 'emoji-pop' + (opts && opts.big ? ' big' : '');
+  el.textContent = emoji;
+  const spread = (opts && opts.spread) ? opts.spread : 40;
+  el.style.left = (50 + (Math.random() - 0.5) * spread) + '%';
+  el.style.top = '80px';
+  c.appendChild(el);
+  setTimeout(() => el.remove(), 2000);
+}
+
+/* Poke reactions (varied, Meu Talking Tom style) */
+const REACTIONS = [
+  {anim:'shake .4s ease-out', emoji:'😵', mouth:'open', dur:500, lines:[
+    'Ai! Meus transistores, cara!',
+    'Cuidado! Sou delicado, tenho circuito aqui dentro!',
+    'Ei, Robobruno tambem tem sentimentos!'
+  ]},
+  {anim:'jump .6s ease-out', emoji:'😲', mouth:'open', dur:650, lines:[
+    'Uou! Me assustou, meu!',
+    'Caramba, chegou chegando!',
+    'Eita! Quase curto-circuitei!'
+  ]},
+  {anim:'tickleShake .6s ease-in-out', emoji:'😂', mouth:'happy', dur:650, lines:[
+    'Hahaha! Faz cocegas nao!',
+    'Para! Meu CPU nao aguenta rir tanto!',
+    'HAHA! Meus pixels estao chorando de rir!'
+  ]},
+  {anim:'wiggle .5s ease-in-out', emoji:'🙄', mouth:'flat', dur:550, lines:[
+    'Serio? De novo?',
+    'Voce nao tem CNPJ pra consultar nao?',
+    'Robobruno nao e brinquedo, viu?'
+  ]},
+  {anim:'celebrate .6s ease-out', emoji:'🤩', mouth:'happy', dur:700, lines:[
+    'Oba! Atencao pro Robobruno!',
+    'Isso ai! Sou o melhor robo da Receita!',
+    'Sou fofinho, eu sei!'
+  ]},
+  {anim:'spin .7s linear', emoji:'💫', mouth:'open', dur:750, lines:[
+    'Eita! Fiquei tonto!',
+    'Estou girando... como minha cabeca!',
+    'Woooosh! La vou eu!'
+  ]}
+];
+
+const ANGRY_REACTIONS = [
+  {anim:'shake .3s ease-out 3', emoji:'😡', mouth:'flat', dur:1000, angry:true, lines:[
+    'CHEGA! Voce esta me irritando!',
+    'Para com isso ou eu entro em modo desligar!',
+    'Robobruno esta furioso! Recue!'
+  ]},
+  {anim:'shake .3s ease-out 3', emoji:'🤬', mouth:'flat', dur:1000, angry:true, lines:[
+    'Quer brigar? Tenho 8 bits de raiva!',
+    'Mais um clique e eu chamo o antivirus!',
+    'Modo combate ativado! Saia daqui!'
+  ]}
+];
+
+/* Robobruno state machine: mouth + whole-body anim driven by current state. */
+const STATE_MOUTH = {
+  idle: 'happy', wave: 'happy', laugh: 'open', celebrate: 'open',
+  angry: 'flat', sad: 'sad', surprise: 'open', think: 'smirk',
+  talk_open: 'open', talk_closed: 'flat'
+};
+const STATE_ANIM = {
+  idle: 'robotFloat 3s ease-in-out infinite',
+  wave: 'celebrate .7s ease-out',
+  laugh: 'tickleShake .7s ease-in-out',
+  celebrate: 'celebrate .8s ease-out',
+  angry: 'shake .4s ease-out',
+  sad: 'sadDroop .6s ease-out forwards',
+  surprise: 'jump .5s ease-out',
+  think: 'wiggle .6s ease-in-out'
+};
+
+let foxReturnTimer = null;
+let talkLoopTimer = null;
+let currentFoxState = 'idle';
+
+function setFoxPose(state, _effect) {
+  const svg = document.getElementById('robotSvg');
+  if (!svg) return;
+  currentFoxState = state;
+  setMouth(STATE_MOUTH[state] || 'happy');
+  const anim = STATE_ANIM[state];
+  if (anim) {
+    svg.style.animation = anim;
+    // Return to idle float after one-shot animations (except for idle/sad)
+    if (state !== 'idle' && state !== 'sad') {
+      clearTimeout(svg._animReset);
+      svg._animReset = setTimeout(() => {
+        svg.style.animation = STATE_ANIM.idle;
+      }, 900);
+    }
+  }
+}
+
+function returnToIdle() {
+  stopTalking();
+  setFoxPose('idle');
+}
+
+/* Talking mouth-loop: flip between open and flat/smirk mouth every 160ms while speaking. */
+function startTalking(durationMs) {
+  stopTalking();
+  let open = true;
+  setMouth('open');
+  talkLoopTimer = setInterval(() => {
+    open = !open;
+    setMouth(open ? 'open' : 'smirk');
+  }, 160);
+  if (durationMs) setTimeout(stopTalking, durationMs);
+}
+
+function stopTalking() {
+  if (talkLoopTimer) { clearInterval(talkLoopTimer); talkLoopTimer = null; }
+  // Restore mouth to current state's default
+  setMouth(STATE_MOUTH[currentFoxState] || 'happy');
+}
+
+function playReaction(r) {
+  const img = document.getElementById('robotSvg');
+  if (r.angry && img) {
+    img.classList.add('robot-angry');
+    setTimeout(() => img.classList.remove('robot-angry'), 2000);
+  }
+  // Map animation hint + emoji → best-matching pose
+  const name = (r.anim || '').split(' ')[0];
+  let pose = 'idle';
+  let effect = 'shake';
+  const emoji = r.emoji || '';
+  if (r.angry)                                        { pose = 'angry';     effect = 'shake'; }
+  else if (name === 'celebrate' || name === 'jump')   { pose = 'celebrate'; effect = 'bounce'; }
+  else if (name === 'tickleShake' || emoji === '😂')  { pose = 'laugh';     effect = 'shake'; }
+  else if (emoji === '😲' || emoji === '😵')           { pose = 'surprise';  effect = 'bounce'; }
+  else if (emoji === '🙄' || emoji === '😎')           { pose = 'think';     effect = 'spin'; }
+  else if (name === 'spin' || name === 'wiggle')     { pose = 'wave';      effect = 'spin'; }
+  else                                                { pose = 'wave';      effect = 'shake'; }
+
+  setFoxPose(pose, effect);
+  popEmoji(r.emoji);
+  say(r.lines[Math.floor(Math.random() * r.lines.length)]);
+
+  clearTimeout(foxReturnTimer);
+  foxReturnTimer = setTimeout(returnToIdle, (r.dur || 600) + 600);
+}
+
+function pokeRobot() {
+  const now = Date.now();
+  if (now - lastPokeAt > 3000) pokeCount = 0;
+  lastPokeAt = now;
+  pokeCount++;
+  if (pokeCount >= 5) {
+    playReaction(ANGRY_REACTIONS[Math.floor(Math.random() * ANGRY_REACTIONS.length)]);
+  } else {
+    // Merge general + part-specific reactions for more variety with the image mascot
+    const pool = REACTIONS.concat(Object.values(PART_REACTIONS));
+    playReaction(pool[Math.floor(Math.random() * pool.length)]);
+  }
+}
+
+/* Part-specific reactions */
+const PART_REACTIONS = {
+  partHead: {anim:'wiggle .5s ease-in-out', emoji:'🧠', mouth:'open', dur:550, lines:[
+    'Ai minha cabeca! Tem muito CNPJ aqui dentro!',
+    'Meu processador ta a mil, calma ai!',
+    'Nao mexe no cerebro, to pensando!'
+  ]},
+  partChest: {anim:'jump .5s ease-out', emoji:'💙', mouth:'happy', dur:600, lines:[
+    'BEEP! BOOP! Coracao de robo!',
+    'Ai, meu painel de controle!',
+    'Esse e meu botao favorito!'
+  ]},
+  partAntenna: {anim:'shake .3s ease-out 2', emoji:'📡', mouth:'open', dur:700, lines:[
+    'EI! Isso e meu WiFi!',
+    'Perdi o sinal! To offline!',
+    'Minha antena! Como vou falar com a Receita agora?'
+  ]},
+  leftArm: {anim:'celebrate .6s ease-out', emoji:'👋', mouth:'happy', dur:700, lines:[
+    'Oi! Oi! Tchau! Oi de novo!',
+    'Gosta do meu aceno? Treinei muito!',
+    'Aperta minha mao, sou um robo educado!'
+  ]},
+  rightArm: {anim:'wiggle .5s ease-in-out', emoji:'💪', mouth:'happy', dur:600, lines:[
+    'Olha meu biceps de aluminio!',
+    'Quer ver forca? Levanto 3 CNPJs com um braco so!',
+    'Flexiona comigo! Vai, forca!'
+  ]},
+  leftLeg: {anim:'jump .5s ease-out', emoji:'🦿', mouth:'open', dur:600, lines:[
+    'Ai! Minha perna! Nao chuta, nao!',
+    'Eu nao corro, eu teleprocesso!',
+    'Essa perna ainda ta na garantia, viu?'
+  ]},
+  rightLeg: {anim:'spin .6s linear', emoji:'🕺', mouth:'happy', dur:650, lines:[
+    'Dancinha do Robobruno! Uh uh uh!',
+    'Quer ver eu dancando? Olha!',
+    'Acho que vou abrir um canal de danca.'
+  ]}
+};
+
+function wireBodyParts() {
+  Object.keys(PART_REACTIONS).forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('click', function(e) {
+      e.stopPropagation();
+      // still count as poke for rage escalation
+      const now = Date.now();
+      if (now - lastPokeAt > 3000) pokeCount = 0;
+      lastPokeAt = now;
+      pokeCount++;
+      if (pokeCount >= 5) {
+        playReaction(ANGRY_REACTIONS[Math.floor(Math.random() * ANGRY_REACTIONS.length)]);
+      } else {
+        playReaction(PART_REACTIONS[id]);
+      }
+    });
+  });
+}
+
+/* Mouse-follow eyes: pupils track cursor */
+let mouseFollowActive = true;
+let lastOrbitUpdate = 0;
+function initEyeTracking() {
+  const svg = document.getElementById('robotSvg');
+  if (!svg) return;
+  document.addEventListener('mousemove', function(e) {
+    if (!mouseFollowActive || isSearching) return;
+    const now = Date.now();
+    if (now - lastOrbitUpdate < 40) return;
+    lastOrbitUpdate = now;
+    const lp = document.getElementById('leftPupil');
+    const rp = document.getElementById('rightPupil');
+    if (!lp || !rp) return;
+    const rect = svg.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = e.clientX - cx;
+    const dy = e.clientY - cy;
+    const dist = Math.max(1, Math.sqrt(dx*dx + dy*dy));
+    const offX = Math.max(-5, Math.min(5, (dx / dist) * 5));
+    const offY = Math.max(-5, Math.min(5, (dy / dist) * 5));
+    lp.setAttribute('cx', 67 + offX);
+    lp.setAttribute('cy', 51 + offY);
+    rp.setAttribute('cx', 117 + offX);
+    rp.setAttribute('cy', 51 + offY);
+  });
+}
+
+/* Input-focus reaction — Robobruno perks up when you start typing */
+function initInputReactions() {
+  const input = document.getElementById('cnpjInput');
+  if (!input) return;
+  input.addEventListener('focus', function() {
+    if (isSearching) return;
+    setFoxPose('wave', 'bounce');
+    popEmoji('👀');
+    say('Opa! Vai digitar? To de olho!');
+    clearTimeout(foxReturnTimer);
+    foxReturnTimer = setTimeout(returnToIdle, 2200);
+  });
+  input.addEventListener('input', function() {
+    if (isSearching) return;
+    // No-op blink for image mascot
+  });
+}
+
+/* Idle trash-talk (when not searching) */
+const IDLE_QUIPS = [
+  'Cade meu cafe? Quer dizer, minha bateria...',
+  'To aqui parado, vamos consultar alguem?',
+  'Sou o Robobruno, CNPJ e comigo mesmo!',
+  'Ja pensou em quantos CNPJs ja existiram? Eu pensei. Varios.',
+  'To com vontade de consultar um CNPJ agora...',
+  'Voce sabia que eu nunca durmo? E isso cansa, viu!',
+  'Psiu! Digita um CNPJ ai, to com tempo!',
+  'Ser robo da Receita e solitario, sabia?',
+  'Meu firmware esta atualizado, pode confiar!',
+  'Ja tomei 3 cafes hoje... digo, 3 cargas de bateria!',
+  'Se voce nao digitar um CNPJ, eu vou dormir no teclado!',
+  'Robobruno esta pronto! So me dar um numero!',
+  'Cada CNPJ tem uma historia. Me conte uma!',
+  'Nao sou paranoico, mas a Receita ta sempre observando...',
+  'Voce ai do outro lado da tela, oi!'
+];
+
+const IDLE_SCREEN_TEXTS = ['ROBOBRUNO', 'ON-LINE', 'READY', 'V3.0', 'AGUARDANDO', 'CAFE?', 'BEEP', 'SISTEMAS OK'];
+
+function startIdleChatter() {
+  stopIdleChatter();
+  const st = document.getElementById('screenText');
+  // Quip rotation
+  idleChatterTimer = setInterval(() => {
+    if (isSearching) return;
+    // Rotate speech every other tick; chest text every tick
+    if (Math.random() < 0.6) {
+      say(IDLE_QUIPS[Math.floor(Math.random() * IDLE_QUIPS.length)]);
+    }
+    if (st) st.textContent = IDLE_SCREEN_TEXTS[Math.floor(Math.random() * IDLE_SCREEN_TEXTS.length)];
+  }, 7000);
+  // Idle blink (slow, natural)
+  idleBlinkTimer = setInterval(() => {
+    if (!isSearching) blinkEyes();
+  }, 4000);
+}
+
+function stopIdleChatter() {
+  clearInterval(idleChatterTimer);
+  clearInterval(idleBlinkTimer);
+  idleChatterTimer = null;
+  idleBlinkTimer = null;
+}
+
+/* Robot mouth states */
+function setMouth(state) {
+  const mp = document.getElementById('mouthPath');
+  if (!mp) return;
+  if (state === 'happy')      mp.setAttribute('d', 'M72 74 Q90 86 108 74');
+  else if (state === 'sad')   mp.setAttribute('d', 'M72 82 Q90 72 108 82');
+  else if (state === 'open')  mp.setAttribute('d', 'M76 74 Q90 86 104 74 Q90 90 76 74');
+  else if (state === 'flat')  mp.setAttribute('d', 'M74 78 L106 78');
+  else if (state === 'smirk') mp.setAttribute('d', 'M74 78 Q90 82 108 74');
+  else                        mp.setAttribute('d', 'M72 74 Q90 86 108 74');
+}
+
+/* ── Confetti ── */
+function launchConfetti() {
+  const c = document.createElement('div');
+  c.className = 'confetti-container';
+  document.body.appendChild(c);
+  const colors = ['var(--grn)','var(--blu)','var(--yel)','var(--purple)','var(--red)','#fff'];
+  for (let i = 0; i < 60; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.left = Math.random()*100+'%';
+    p.style.background = colors[Math.floor(Math.random()*colors.length)];
+    p.style.animationDelay = Math.random()*1.5+'s';
+    p.style.animationDuration = (2+Math.random()*2)+'s';
+    p.style.width = (4+Math.random()*8)+'px';
+    p.style.height = (4+Math.random()*8)+'px';
+    p.style.borderRadius = Math.random()>.5?'50%':'2px';
+    c.appendChild(p);
+  }
+  setTimeout(() => c.remove(), 4000);
+}
+
+/* ── Main Flow ── */
+function startLookup() {
+  const raw = cnpjInput.value.replace(/\D/g, '');
+  if (!validateCNPJ(raw)) {
+    inputError.textContent = 'CNPJ invalido. Verifique os digitos.';
+    return;
+  }
+  inputError.textContent = '';
+  companyData = null;
+  isSearching = true;
+
+  // Disable search
+  document.getElementById('searchBtn').disabled = true;
+  cnpjInput.disabled = true;
+
+  // Hide results, show mascot
+  document.getElementById('resultsArea').classList.remove('active');
+  document.getElementById('resultsArea').innerHTML = '';
+
+  // Start robot animations (pause idle chatter during search)
+  stopIdleChatter();
+  setFoxPose('think');
+  startEyeMovement();
+  startRandomActions();
+  startFloatingIcons();
+  startFunFacts();
+
+  const screenText = document.getElementById('screenText');
+  if (screenText) screenText.textContent = 'CONSULTANDO...';
+
+  const searchLines = [
+    'Hmm, deixa eu hackear... quer dizer, consultar os dados...',
+    'Conectando com a Receita Federal... eles sao lentos, nao eu!',
+    'Vasculhando bancos de dados... isso e mais facil que sudoku!'
+  ];
+  say(searchLines[Math.floor(Math.random()*searchLines.length)]);
+
+  // SSE lookup. Supabase Storage serves this HTML but won't proxy the function call,
+  // so when we're on Supabase Storage (or any non-local host) we hit the Edge Function absolute URL.
+  const HOST = window.location.hostname;
+  const IS_LOCAL = HOST === 'localhost' || HOST === '127.0.0.1';
+  const streamUrl = IS_LOCAL
+    ? '/api/lookup-stream?cnpj=' + raw
+    : 'https://antgruwugsizmtcfjglo.supabase.co/functions/v1/debora/api/lookup-stream?cnpj=' + raw;
+  const es = new EventSource(streamUrl);
+
+  es.addEventListener('status', function(e) {
+    const d = JSON.parse(e.data);
+    const statusMsgs = [
+      'Hmm, deixa eu hackear... quer dizer, consultar os dados...',
+      'Conectando com a Receita Federal... eles sao lentos, nao eu!',
+      'Vasculhando bancos de dados... isso e mais facil que sudoku!',
+      'Quase la! Os servidores do governo estao cooperando hoje...',
+      'Decifrando bytes... isso e fichinha pra mim!'
+    ];
+    say(d.message || d.msg || statusMsgs[Math.floor(Math.random()*statusMsgs.length)]);
+  });
+
+  es.addEventListener('result', function(e) {
+    companyData = JSON.parse(e.data);
+  });
+
+  es.addEventListener('done', function(e) {
+    es.close();
+    isSearching = false;
+    stopRandomActions();
+    stopFloatingIcons();
+    stopFunFacts();
+    stopEyeMovement();
+    startIdleChatter();
+
+    const screenText = document.getElementById('screenText');
+    if (screenText) screenText.textContent = 'ROBOBRUNO';
+
+    const svg = document.getElementById('robotSvg');
+
+    if (!companyData) {
+      setFoxPose('sad');
+      say('Poxa... nao achei esse CNPJ. Me da outro, vai?');
+      popEmoji('😔', {big:true});
+      clearTimeout(foxReturnTimer);
+      foxReturnTimer = setTimeout(returnToIdle, 2500);
+      enableSearch();
+      return;
+    }
+
+    const name = companyData.razao_social || companyData.nome_fantasia || 'essa empresa';
+    const ie = (companyData.inscricao_estadual || '').trim();
+
+    if (ie) {
+      say('ACHEI! ' + name + ' com IE ' + ie + '. Robobruno entrega!');
+      popEmoji('🎉', {big:true});
+      setTimeout(() => popEmoji('✨', {spread:80}), 200);
+      setTimeout(() => popEmoji('🦊', {spread:80}), 400);
+      setTimeout(() => popEmoji('💚', {spread:80}), 600);
+      setFoxPose('celebrate','bounce');
+      clearTimeout(foxReturnTimer);
+      foxReturnTimer = setTimeout(returnToIdle, 2200);
+      launchConfetti();
+    } else {
+      setFoxPose('surprise');
+      say('Achei ' + name + ', mas cade a IE? ' +
+          (companyData._ie_unavailable_reason || 'Fonte nao retornou IE') + '.');
+      popEmoji('🤨', {big:true});
+      setTimeout(() => popEmoji('❓', {spread:60}), 300);
+      clearTimeout(foxReturnTimer);
+      foxReturnTimer = setTimeout(returnToIdle, 2500);
+    }
+
+    showResults();
+    enableSearch();
+  });
+
+  es.addEventListener('error', function(e) {
+    es.close();
+    isSearching = false;
+    stopRandomActions();
+    stopFloatingIcons();
+    stopFunFacts();
+    startIdleChatter();
+
+    let errMsg = 'Eita! Deu ruim na consulta. Os servidores devem estar no cafe...';
+    try {
+      const d = JSON.parse(e.data);
+      const m = d && (d.message || d.msg);
+      if (m) errMsg = 'Erro: ' + m;
+    } catch(_) {}
+    setFoxPose('sad');
+    say(errMsg);
+    popEmoji('😫', {big:true});
+    clearTimeout(foxReturnTimer);
+    foxReturnTimer = setTimeout(returnToIdle, 3000);
+    enableSearch();
+  });
+
+  es.onerror = function() {
+    es.close();
+    if (isSearching) {
+      isSearching = false;
+      stopRandomActions();
+      stopFloatingIcons();
+      stopFunFacts();
+      startIdleChatter();
+      setFoxPose('sad');
+      say('A conexao caiu! Robobruno esta sozinho aqui...');
+      popEmoji('📡', {big:true});
+      clearTimeout(foxReturnTimer);
+      foxReturnTimer = setTimeout(returnToIdle, 3000);
+      enableSearch();
+    }
+  };
+}
+
+/* ── Show Results ── */
+function showResults() {
+  const d = companyData;
+  if (!d) return;
+
+  const ie = (d.inscricao_estadual || '').trim();
+  const situacaoIE = (d.situacao_ie || '').trim();
+  const ieReason = (d._ie_unavailable_reason || '').trim();
+
+  const area = document.getElementById('resultsArea');
+  const sit = (d.situacao_cadastral || '').toUpperCase();
+  let badgeClass = 'badge-ativa';
+  if (sit.includes('SUSPENS')) badgeClass = 'badge-suspensa';
+  else if (sit.includes('INAPT')) badgeClass = 'badge-inapta';
+  else if (sit.includes('BAIXAD')) badgeClass = 'badge-baixada';
+
+  const formatCurrency = (v) => {
+    if (v == null) return '-';
+    return 'R$ ' + Number(v).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+  };
+
+  const cards = [
+    {label:'Razao Social', value: d.razao_social || '-', full: true},
+    {label:'Nome Fantasia', value: d.nome_fantasia || '-', full: true},
+    {label:'CNPJ', value: d.cnpj || '-'},
+    {label:'Situacao Cadastral', value: d.situacao_cadastral || '-'},
+    {label:'CNAE Principal', value: d.cnae_principal || '-', full: true},
+    {label:'Data de Abertura', value: d.data_abertura || '-'},
+    {label:'Capital Social', value: formatCurrency(d.capital_social)},
+    {label:'Porte', value: d.porte || '-'},
+    {label:'Natureza Juridica', value: d.natureza_juridica || '-', full: true},
+    {label:'Endereco', value: [d.endereco || d.logradouro, d.bairro, d.municipio, d.uf, d.cep].filter(Boolean).join(', ') || '-', full: true},
+    {label:'Telefone', value: d.telefone || '-'},
+    {label:'Email', value: d.email || '-'},
+  ];
+
+  // IE card — always render. Value is strictly what SintegraWS returned,
+  // or the explicit unavailable reason. Never synthesized.
+  if (ie) {
+    cards.push({
+      label: 'Inscricao Estadual',
+      value: ie + (situacaoIE ? ' (' + situacaoIE + ')' : ''),
+      ie: true
+    });
+  } else {
+    cards.push({
+      label: 'Inscricao Estadual',
+      value: ieReason || 'Nao disponivel',
+      ie: true
+    });
+  }
+
+  let html = '<div class="result-header">';
+  html += '<div class="result-company">' + esc(d.razao_social || d.nome_fantasia || '-') + '</div>';
+  html += '<span class="result-badge ' + badgeClass + '">' + esc(sit || 'N/A') + '</span>';
+  html += '</div>';
+  html += '<div class="result-cards">';
+
+  cards.forEach((c, i) => {
+    const cls = ['result-card'];
+    if (c.full) cls.push('full-width');
+    if (c.ie) cls.push('ie-card');
+    cls.push('');
+    html += '<div class="' + cls.join(' ').trim() + '" style="animation-delay:' + (i*0.05) + 's">';
+    html += '<div class="result-card-label">' + esc(c.label) + '</div>';
+    html += '<div class="result-card-value">' + esc(c.value) + '</div>';
+    html += '</div>';
+  });
+
+  html += '</div>';
+  html += '<div class="new-search-btn"><button onclick="resetAll()">Nova Consulta</button></div>';
+
+  area.innerHTML = html;
+  area.classList.add('active');
+  area.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function esc(s) {
+  const el = document.createElement('span');
+  el.textContent = s;
+  return el.innerHTML;
+}
+
+function enableSearch() {
+  document.getElementById('searchBtn').disabled = false;
+  cnpjInput.disabled = false;
+}
+
+function resetAll() {
+  companyData = null;
+  isSearching = false;
+  stopEyeMovement();
+  stopRandomActions();
+  stopFloatingIcons();
+  stopFunFacts();
+
+  document.getElementById('resultsArea').classList.remove('active');
+  document.getElementById('resultsArea').innerHTML = '';
+
+  const screenText = document.getElementById('screenText');
+  if (screenText) screenText.textContent = 'ROBOBRUNO';
+
+  cnpjInput.value = '';
+  cnpjInput.disabled = false;
+  document.getElementById('searchBtn').disabled = false;
+  inputError.textContent = '';
+  cnpjInput.focus();
+  window.scrollTo({top:0, behavior:'smooth'});
+
+  // Show intro again
+  showIntro();
+}
+
+/* ── Intro on page load ── */
+function showIntro() {
+  say('Ola! Eu sou o Robobruno, seu assistente robotico de CNPJ! Digite um numero ai e eu acho tudinho pra voce, ate a Inscricao Estadual. Pode me cutucar tambem, eu reajo!');
+  setMouth('happy');
+  popEmoji('👋');
+  setTimeout(() => {
+    if (!isSearching) {
+      say('To esperando, viu? Digita um CNPJ ai!');
+      setMouth('flat');
+      startIdleChatter();
+    }
+  }, 5000);
+}
+
+// Wire up interactivity + run intro on page load
+wireBodyParts();
+initEyeTracking();
+initInputReactions();
+showIntro();
+</script>
+</body>
+</html>
